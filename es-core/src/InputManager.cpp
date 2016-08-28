@@ -74,16 +74,39 @@ void InputManager::addJoystickByDeviceIndex(int id)
 	SDL_JoystickID joyId = SDL_JoystickInstanceID(joy);
 	mJoysticks[joyId] = joy;
 
-	char guid[65];
-	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, 65);
+	char guid[66];
+	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joy), guid, 66);
 
+	
+//-----------------------------------------------------------------------------------------------------------------
+	//GUID is not "u" enough
+	//changing name to reflect "player n" as name instead of device name
+	std::string namePlayerN="Player ";
+	
+   	const int max_size = std::numeric_limits<int>::digits10 + 1 /*sign*/ + 1 /*0-terminator*/;
+   	char numPlayerString[max_size] = {0};
+   	sprintf(numPlayerString, "%d", (id+1));
+   	
+   	namePlayerN.append(numPlayerString);
+   	//give GUID that more U
+   	strcat( guid, numPlayerString);
+//-----------------------------------------------------------------------------------------------------------------
+	
 	// create the InputConfig
-	mInputConfigs[joyId] = new InputConfig(joyId, SDL_JoystickName(joy), guid);
+//	mInputConfigs[joyId] = new InputConfig(joyId, SDL_JoystickName(joy), guid);
+//-----------------------------------------------------------------------------------------------------------------
+	//modified create input configs
+	mInputConfigs[joyId] = new InputConfig(joyId, namePlayerN, guid);
+//-----------------------------------------------------------------------------------------------------------------
+
+
 	if(!loadInputConfig(mInputConfigs[joyId]))
 	{
-		LOG(LogInfo) << "Added unconfigured joystick " << SDL_JoystickName(joy) << " (GUID: " << guid << ", instance ID: " << joyId << ", device index: " << id << ").";
+//		LOG(LogInfo) << "Added unconfigured joystick " << SDL_JoystickName(joy) << " (GUID: " << guid << ", instance ID: " << joyId << ", device index: " << id << ").";
+		LOG(LogInfo) << "Added unconfigured joystick " << namePlayerN << " (GUID: " << guid << ", instance ID: " << joyId << ", device index: " << id << ").";
 	}else{
-		LOG(LogInfo) << "Added known joystick " << SDL_JoystickName(joy) << " (instance ID: " << joyId << ", device index: " << id << ")";
+//		LOG(LogInfo) << "Added known joystick " << SDL_JoystickName(joy) << " (instance ID: " << joyId << ", device index: " << id << ")";
+		LOG(LogInfo) << "Added known joystick " << namePlayerN << " (instance ID: " << joyId << ", device index: " << id << ")";
 	}
 
 	// set up the prevAxisValues
